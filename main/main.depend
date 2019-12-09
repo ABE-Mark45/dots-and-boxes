@@ -4,11 +4,18 @@
 	<stdlib.h>
 	<stdbool.h>
 
-1575805000 source:d:\college\projects\programming\dots-and-boxes\main\main.c
+1575872534 source:d:\college\projects\programming\dots-and-boxes\main\main.c
 	<stdio.h>
 	<stdlib.h>
 	<stdbool.h>
 	"structs.h"
+	"helper_functions.h"
 
 1575804412 d:\college\projects\programming\dots-and-boxes\main\structs.h
+
+1575871936 source:d:\college\projects\programming\dots-and-boxes\main\helper_functions.c
+	<stdlib.h>
+
+1575872111 d:\college\projects\programming\dots-and-boxes\main\helper_functions.h
+	<stdlib.h>
 

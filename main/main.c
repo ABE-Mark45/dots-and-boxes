@@ -88,8 +88,8 @@ void print_grid(Game *game){
 
     */
     initialize_grid(game);
-    game->grid[1][1].up =  1;
-    game->grid[0][1].left = 1;
+    /*game->grid[1][1].up =  1;
+    game->grid[0][1].left = 1;*/
 
     printf("\n");
     for(int i=0; i<grid_length; i++){
@@ -126,12 +126,12 @@ bool in_grid(int point, int grid_length){
 
 bool validate_points(int row1, int row2, int col1, int col2, Game *game){
     int grid_length = game->grid_length;
-    if( ! (in_grid(row1,grid_length) && in_grid(row2,grid_length) && in_grid(col1,grid_length) && in_grid(col2,grid_length)) ){
+    if(!(in_grid(row1,grid_length) && in_grid(row2,grid_length) && in_grid(col1,grid_length) && in_grid(col2,grid_length))){
         return false;
     }
 
     bool adjacent = (row1 == row2 || col1 == col2)
-    && (abs(row1 - row2) == 1 || abs(col1 - col2 == 1)) ;
+    && (abs(row1 - row2) == 1 || abs(col1 - col2) == 1) ;
     if(! adjacent)
         return false;
 
@@ -149,10 +149,12 @@ void play_game(Game *game){
             if(!valid_input)
                 printf("Enter Valid numbers\n");
             int num_of_inputs = scanf("%d %d %d %d",&row1,&row2,&col1,&col2);
+            printf("n = %d\nvalidate = %d", num_of_inputs,validate_points(row1,row2,col1,col2,game));
             valid_input = num_of_inputs == 4 && validate_points(row1,row2,col1,col2,game);
         } while (!valid_input);
 
-
+        game->grid[row1][col1].up = 1;
+        print_grid(&game);
     }
 }
 
