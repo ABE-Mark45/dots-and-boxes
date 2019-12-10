@@ -4,8 +4,8 @@ typedef struct{
 } Move;
 
 typedef struct{
-    bool up,right,down,left;
-    int player;
+    int up,right,down,left;
+    int covered_by_player;
 } Square;
 
 typedef struct {
@@ -14,6 +14,8 @@ typedef struct {
     int grid_length;
     int player1_points;
     int player2_points;
+    int number_of_moves;
+    Move moves[100];
     Square grid[20][20];
 
 } Game;

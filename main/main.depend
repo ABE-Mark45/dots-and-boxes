@@ -19,3 +19,12 @@
 1575872111 d:\college\projects\programming\dots-and-boxes\main\helper_functions.h
 	<stdlib.h>
 
+1575982377 source:c:\users\abdelrahman\desktop\project\dots-and-boxes\main\main.c
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+	<windows.h>
+	"structs.h"
+
+1575905231 c:\users\abdelrahman\desktop\project\dots-and-boxes\main\structs.h
+
