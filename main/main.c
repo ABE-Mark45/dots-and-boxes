@@ -20,7 +20,7 @@
 
 */
 
-void print_moves(Game *game){
+void print_all_played_moves(Game *game){
     int num_of_moves = game->number_of_moves;
     for(int i=0; i<num_of_moves; i++){
         printf("%d %d %d %d", game->moves[i].row1, game->moves[i].row2,
@@ -30,7 +30,7 @@ void print_moves(Game *game){
 
 
 
-void make_move_struct(Move *move, int row1, int row2, int col1,int col2){
+void record_move(Move *move, int row1, int row2, int col1,int col2){
     move->row1 = row1;
     move->row2 = row2;
     move->col1 = col1;
@@ -45,7 +45,7 @@ bool is_move_previously_played(Game *game,int row1, int row2, int col1, int col2
     if(row1 == row2){
         Square *square1 = &(game->grid[row1-1][min(col1,col2)]);
         Square *square2 = &(game->grid[row1][min(col1,col2)]);
-        if(square1->down !=0 || square2->up !=0)
+        if(square1->down !=0 || square2->up !=0) // square previously filled
             return true;
 
     }
@@ -144,7 +144,7 @@ void print_grid(Game *game){
     char in_between_line[(scale+1)*grid_length+10];
 
     /*
-        IF the Square of size (4) (scale=2):
+        IF the Square of size (3) (scale=3):
 
         main_line               *---*---*---*
         in_between_line         |---|   |
@@ -203,8 +203,7 @@ bool enter_options (Game *game){
         game->grid_length = 5+1;
 
 
-    // terminate program ??
-    //system("@cls||clear");
+    system("@cls||clear");
     printf("Pick a menu number: \n \
            1. Players vs Player\n \
            2. Player vs Computer\n");
@@ -221,14 +220,12 @@ bool enter_options (Game *game){
         game->PVP = 1;
     else
         game->PVP = 0;
-    //print_game(game);
 
     initialize_game(game);
 
     return ;
 }
 
-//
 bool is_colored_square(Square *square){
     if(square->right != 0
        && square->left != 0
@@ -240,24 +237,25 @@ bool is_colored_square(Square *square){
 
 void color_square(Square *square, int num_of_moves){
     int color = (num_of_moves%2)+1;
-    square->covered_by_player = color;
+    square->covered_by_player = color; // give the square to the player
 }
 
 void play_game(Game *game){
     int row1,row2,col1,col2;
     int player_turn = 1;
     while(game->number_of_moves < (game->grid_length*(game->grid_length+1))*2 ){
-        //printf("%d", game->grid_length);
+
+        // print game after each play
         print_grid(game);
         printf("player1 Points: %d - player2 points: %d\n", game->player1_points,
            game->player2_points);
-        print_moves(game);
+
         bool valid_input = 1;
         do{
             if(!valid_input)
                 printf("Enter Valid numbers\n");
             int num_of_inputs = scanf("%d %d %d %d",&row1,&row2,&col1,&col2);
-            make_move_struct(&(game->moves[game->number_of_moves]),row1,row2,col1,col2);
+            record_move( &(game->moves[game->number_of_moves]), row1,row2,col1,col2);
             valid_input = num_of_inputs == 4 && validate_points(row1,row2,col1,col2,game);
             if(valid_input)
                 if(is_move_previously_played(game, row1,row2,col1,col2) == true)
@@ -268,13 +266,12 @@ void play_game(Game *game){
 
 
         Square *square1,*square2;
-        // check that the line isn't previously picked
 
 
         // Horizontal Line
         if(row1 == row2){
-            square1 = &(game->grid[row1-1][min(col1,col2)]);
-            square2 = &(game->grid[row1][min(col1,col2)]);
+            square1 = &(game->grid[row1-1][min(col1,col2)]); // upper square
+            square2 = &(game->grid[row1][min(col1,col2)]); // lower square
             square1->down = player_turn;
             square2->up= player_turn;
 
@@ -282,14 +279,14 @@ void play_game(Game *game){
 
         // Vertical Line
         else if(col1 == col2){
-            square1 = &(game->grid[min(row1,row1)][col1]);
-            square2 = &(game->grid[min(row1,row2)][col1-1]);
+            square1 = &(game->grid[min(row1,row1)][col1]); // right square
+            square2 = &(game->grid[min(row1,row2)][col1-1]); // left square
             square1->left = player_turn;
             square2->right = player_turn;
 
 
         }
-        //printf("%d %d %d\n", square1->left, square1->up, square1->down);
+
         if( is_colored_square(square1) ){
             color_square(square1, game->number_of_moves );
             if(player_turn == 1)game->player1_points++;
@@ -301,10 +298,10 @@ void play_game(Game *game){
             else game->player2_points++;
 
         }
-        //print_grid_values(game);
+
         player_turn = (3 - player_turn); // change player
         game->number_of_moves++;
-      //  print_grid_values(game);
+
 
     }
 }
@@ -367,13 +364,6 @@ int main()
 
     Game game;
 
-    //play_main_menu(&game);
-//    print_grid(&game);
-    //printf("%d", validate_points(1,1,3,));
-
-     // int row1,row2,col1,col2;
-    // printf("%d\n" ,scanf("%d %d %d %d",&row1,&row2,&col1,&col2));
-    // printf("%d\n", col1);
     play_main_menu(&game);
     return 0;
 }
