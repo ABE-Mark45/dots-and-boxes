@@ -15,6 +15,7 @@ typedef struct {
     int player1_points;
     int player2_points;
     int number_of_moves;
+    int player_turn;
     Move moves[100];
     Square grid[20][20];
 

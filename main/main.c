@@ -3,8 +3,11 @@
 #include <stdbool.h>
 #include <windows.h>
 #include "structs.h"
-
+#define blue 9
+#define green 10
+#define white 15
 /*
+Expert Game:
 1 1 1 2
 3 3 2 3
 0 0 1 2
@@ -15,6 +18,15 @@
 2 3 3 3
 1 1 1 2
 2 2 2 3
+1 1 2 3
+0 1 3 3
+0 1 0 0
+0 0 2 3
+0 0 0 1
+
+
+Beginner Game:
+0 0 1 2
 
 
 
@@ -82,6 +94,7 @@ void initialize_game(Game *game){
     game->number_of_moves=0;
     game->player1_points=0;
     game->player2_points=0;
+    game->player_turn = 1;
 
 }
 
@@ -138,11 +151,13 @@ void print_grid(Game *game){
     int scale = 6; // number of '-'
 
 //    Sqaure *grid = game->grid;
-    char full_side[scale+1], empty_side[scale+1];
+    char full_side[scale+1], empty_side[scale+1],
+    in_between_line[(scale+1)*grid_length+10],
+    full_box[scale+1];
+
     fill_string(full_side,'-',scale);
     fill_string(empty_side,' ',scale);
-    char in_between_line[(scale+1)*grid_length+10];
-
+    fill_string(full_box,'#',scale);
     /*
         IF the Square of size (3) (scale=3):
 
@@ -152,15 +167,34 @@ void print_grid(Game *game){
 
 
     */
+    HANDLE  hConsole;
+    hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    int color1= 9;
+    int color2= 10;
+    // you can loop k higher to see more color choices
+   /* for(int k = 1; k < 255; k++)
+    {
+        SetConsoleTextAttribute(hConsole, k);
+        printf("%3d  %s\n", k, "I want to be nice today!");
+    }*/
 
     for(int i=0; i<grid_length; i++){
         fill_string(in_between_line,' ',(scale+1)*grid_length+3);
         for(int j=0; j<grid_length; j++){
             // main_line
+
             if(j<grid_length-1){
                 printf("+");
-                if(game->grid[i][j].up!= 0 )
+                if(game->grid[i][j].up!= 0 ){
+                    if(game->grid[i][j].up == 1)
+                        SetConsoleTextAttribute(hConsole, blue);
+                    else // == 2
+                        SetConsoleTextAttribute(hConsole, green);
+
+
                     printf("%s",full_side);
+                    SetConsoleTextAttribute(hConsole, white);
+                }
                 else
                     printf("%s",empty_side);
             }
@@ -171,8 +205,40 @@ void print_grid(Game *game){
         }
         printf("+\n");
         if(i != grid_length-1){
-            for(int k=0; k<scale/3; k++)
-                printf("%s\n",in_between_line);
+            for(int k=0; k<scale/3; k++){
+                for(int j=0; j<grid_length; j++){
+                    if(game->grid[i][j].left!= 0 ){
+                        if(game->grid[i][j].left == 1)
+                            SetConsoleTextAttribute(hConsole, blue);
+                        else // == 2
+                            SetConsoleTextAttribute(hConsole, green);
+
+
+                        printf("|");
+                        SetConsoleTextAttribute(hConsole, white);
+                    }
+                    else
+                        printf(" ");
+
+                    if(game->grid[i][j].covered_by_player == 1){
+                        SetConsoleTextAttribute(hConsole, blue);
+                        printf("%s", full_box);
+                        SetConsoleTextAttribute(hConsole, white);
+                    }
+
+                    else if(game->grid[i][j].covered_by_player == 2){
+                        SetConsoleTextAttribute(hConsole, green);
+                        printf("%s", full_box);
+                        SetConsoleTextAttribute(hConsole, white);
+                    }
+                    else
+                        printf("%s",empty_side);
+                }
+                printf("\n");
+
+            }
+                //
+
         }
     }
 
@@ -235,45 +301,48 @@ bool is_colored_square(Square *square){
     return 0;
 }
 
-void color_square(Square *square, int num_of_moves){
-    int color = (num_of_moves%2)+1;
-    square->covered_by_player = color; // give the square to the player
+void color_square(Square *square, int player_turn){
+    square->covered_by_player = player_turn; // give the square to the player
 }
 
 void play_game(Game *game){
     int row1,row2,col1,col2;
-    int player_turn = 1;
     while(game->number_of_moves < (game->grid_length*(game->grid_length+1))*2 ){
 
         // print game after each play
         print_grid(game);
-        printf("player1 Points: %d - player2 points: %d\n", game->player1_points,
+        printf("\n");
+        printf("player1 Points: %d - player2 points: %d\n\n", game->player1_points,
            game->player2_points);
-
-        bool valid_input = 1;
+        bool valid_input;
         do{
-            if(!valid_input)
-                printf("Enter Valid numbers\n");
+
             int num_of_inputs = scanf("%d %d %d %d",&row1,&row2,&col1,&col2);
-            record_move( &(game->moves[game->number_of_moves]), row1,row2,col1,col2);
             valid_input = num_of_inputs == 4 && validate_points(row1,row2,col1,col2,game);
-            if(valid_input)
-                if(is_move_previously_played(game, row1,row2,col1,col2) == true)
+            if(valid_input){
+                if(is_move_previously_played(game, row1,row2,col1,col2) == true){
                     valid_input = false;
+                }
+                else
+                    record_move( &(game->moves[game->number_of_moves]), row1,row2,col1,col2);
+            }
 
-
+            if(!valid_input){
+                char wrong_input[100000];
+                fgets(wrong_input,100000-1,stdin);
+                printf("Enter Valid numbers\n");
+            }
         } while (!valid_input);
 
 
         Square *square1,*square2;
 
-
         // Horizontal Line
         if(row1 == row2){
             square1 = &(game->grid[row1-1][min(col1,col2)]); // upper square
             square2 = &(game->grid[row1][min(col1,col2)]); // lower square
-            square1->down = player_turn;
-            square2->up= player_turn;
+            square1->down = game->player_turn;
+            square2->up= game->player_turn;
 
         }
 
@@ -281,25 +350,26 @@ void play_game(Game *game){
         else if(col1 == col2){
             square1 = &(game->grid[min(row1,row1)][col1]); // right square
             square2 = &(game->grid[min(row1,row2)][col1-1]); // left square
-            square1->left = player_turn;
-            square2->right = player_turn;
+            square1->left = game->player_turn;
+            square2->right = game->player_turn;
 
 
         }
 
         if( is_colored_square(square1) ){
-            color_square(square1, game->number_of_moves );
-            if(player_turn == 1)game->player1_points++;
+            color_square(square1, game->player_turn );
+            if(game->player_turn == 1)game->player1_points++;
             else game->player2_points++;
+            game->player_turn = (3 - game->player_turn); // to change player twice here and at the end of the loop
         }
         if( is_colored_square(square2) ){
-            color_square(square2, game->number_of_moves );
-            if(player_turn == 1)game->player1_points++;
+            color_square(square2, game->player_turn );
+            if(game->player_turn == 1)game->player1_points++;
             else game->player2_points++;
-
+            game->player_turn = (3 - game->player_turn);
         }
 
-        player_turn = (3 - player_turn); // change player
+        game->player_turn = (3 - game->player_turn); // change player
         game->number_of_moves++;
 
 
@@ -347,21 +417,19 @@ int main()
 {
 
     // THIS CODE EXPLAINS HOW TO COLOR THE CONSOLE USE IT
-/*
-    HANDLE  hConsole;
 
+
+  /*   HANDLE  hConsole;
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    int color1= 9;
+    int color2= 10;
+    // you can loop k higher to see more color choices
+    for(int k = 1; k < 255; k++)
+    {
 
-  // you can loop k higher to see more color choices
-  for(int k = 1; k < 255; k++)
-  {
-    SetConsoleTextAttribute(hConsole, k);
-    printf("%3d  %s\n", k, "I want to be nice today!");
-  }
-
-  getchar();  // wait
-*/
-
+        SetConsoleTextAttribute(hConsole, k);
+        printf("%3d  %s\n", k, "I want to be nice today!");
+    }*/
     Game game;
 
     play_main_menu(&game);
