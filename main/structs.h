@@ -20,3 +20,8 @@ typedef struct {
     Square grid[20][20];
 
 } Game;
+
+typedef struct{
+    int row1,row2,col1,col2;
+    int save;
+} Input;

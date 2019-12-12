@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <windows.h>
 #include "structs.h"
+#include "file_system.h"
 #define blue 9
 #define green 10
 #define white 15
@@ -245,6 +246,15 @@ void print_grid(Game *game){
 }
 // 1 1 3 2 >> 1,1
 
+Game load_menu (){
+    FILE *pointer;
+    int file_num;
+    printf("Enter number of file (1,2,3)");
+    scanf("%d",&file_num);
+    Game game;
+    game = load_game(file_num);
+    return game;
+}
 
 bool enter_options (Game *game){
     printf("Pick a menu number:\n\
@@ -305,19 +315,33 @@ void color_square(Square *square, int player_turn){
     square->covered_by_player = player_turn; // give the square to the player
 }
 
+
 void play_game(Game *game){
     int row1,row2,col1,col2;
     while(game->number_of_moves < (game->grid_length*(game->grid_length+1))*2 ){
-
         // print game after each play
         print_grid(game);
         printf("\n");
         printf("player1 Points: %d - player2 points: %d\n\n", game->player1_points,
            game->player2_points);
+
         bool valid_input;
         do{
+            char input_str[1000] = "";
+            fgets(input_str,1000,stdin);
+            if (is_save(input_str)){
+                printf("Hello: %s",input_str);
+                save_menu(game);
+            }
+            int num_of_inputs;
+            num_of_inputs = sscanf(input_str,"%d %d %d %d",&row1,&row2,&col1,&col2);
 
-            int num_of_inputs = scanf("%d %d %d %d",&row1,&row2,&col1,&col2);
+            printf("-----------------------------------------\n");
+            printf("num = %d\n",num_of_inputs);
+            printf("inputs = %d %d %d %d\n",row1,row2,col1,col2);
+            printf("-----------------------------------------\n");
+
+
             valid_input = num_of_inputs == 4 && validate_points(row1,row2,col1,col2,game);
             if(valid_input){
                 if(is_move_previously_played(game, row1,row2,col1,col2) == true){
@@ -400,6 +424,8 @@ void play_main_menu(Game *game){
         play_game(game);
         break;
     case '2':
+        load_game(1);
+        break;
     case '3':
 
     case '4':
@@ -432,6 +458,8 @@ int main()
     }*/
     Game game;
 
+    //print_grid(&game);
     play_main_menu(&game);
+
     return 0;
 }
