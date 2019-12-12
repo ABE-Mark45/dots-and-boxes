@@ -13,6 +13,7 @@ Game load_game (int file_num){
 
     print_game_struct_values(&game);
     print_grid(&game);
+    play_game(&game);
 }
 
 bool is_save(char input_str[1000]){
