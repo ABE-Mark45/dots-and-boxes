@@ -322,15 +322,15 @@ void play_game(Game *game){
         // print game after each play
         print_grid(game);
         printf("\n");
-        printf("player1 Points: %d - player2 points: %d\n\n", game->player1_points,
+        printf("player1 Points: %d - player2 points: %d\n", game->player1_points,
            game->player2_points);
-
+        printf("Enter \"save\" to save\n");
         bool valid_input;
         do{
+            
             char input_str[1000] = "";
             fgets(input_str,1000,stdin);
             if (is_save(input_str)){
-                printf("Hello: %s",input_str);
                 save_menu(game);
             }
             int num_of_inputs;
