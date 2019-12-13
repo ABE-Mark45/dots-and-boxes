@@ -16,11 +16,6 @@ Game load_game (){
     fread(&game,sizeof(Game),1,save_file);
     fclose(save_file);
 
-<<<<<<< HEAD
-=======
-    print_game_struct_values(&game);
-    print_grid(&game);
->>>>>>> 01137b5242b8bbebae62d5a44b81d02506131743
     play_game(&game);
 }
 

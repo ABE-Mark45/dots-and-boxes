@@ -317,10 +317,9 @@ void play_game(Game *game){
         printf("Enter \"save\" to save\n");
         bool valid_input;
         do{
-            
+
             char input_str[1000] = "";
             fgets(input_str,1000,stdin);
-<<<<<<< HEAD
 
             if (compare_str(input_str, "save\n")){
                 printf("detected save \n");
@@ -331,10 +330,6 @@ void play_game(Game *game){
                 system("@cls||clear");
                 play_main_menu(game);
                 return;
-=======
-            if (is_save(input_str)){
-                save_menu(game);
->>>>>>> 01137b5242b8bbebae62d5a44b81d02506131743
             }
 
             int num_of_inputs;
