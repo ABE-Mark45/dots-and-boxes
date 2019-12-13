@@ -246,16 +246,6 @@ void print_grid(Game *game){
 }
 // 1 1 3 2 >> 1,1
 
-Game load_menu (){
-    FILE *pointer;
-    int file_num;
-    printf("Enter number of file (1,2,3)");
-    scanf("%d",&file_num);
-    Game game;
-    game = load_game(file_num);
-    return game;
-}
-
 bool enter_options (Game *game){
     printf("Pick a menu number:\n\
            1. Beginner (2 by 2 grid)\n\
@@ -329,17 +319,26 @@ void play_game(Game *game){
         do{
             char input_str[1000] = "";
             fgets(input_str,1000,stdin);
-            if (is_save(input_str)){
-                printf("Hello: %s",input_str);
-                save_menu(game);
+
+            if (compare_str(input_str, "save\n")){
+                printf("detected save \n");
+                save_game(game);
+                continue;
             }
+            else if (compare_str(input_str, "exit\n")){
+                system("@cls||clear");
+                play_main_menu(game);
+                return;
+            }
+
             int num_of_inputs;
             num_of_inputs = sscanf(input_str,"%d %d %d %d",&row1,&row2,&col1,&col2);
 
-            printf("-----------------------------------------\n");
+            printf("\n-----------------------------------------\n");
+            printf("%s",input_str);
             printf("num = %d\n",num_of_inputs);
             printf("inputs = %d %d %d %d\n",row1,row2,col1,col2);
-            printf("-----------------------------------------\n");
+            printf("-----------------------------------------\n\n");
 
 
             valid_input = num_of_inputs == 4 && validate_points(row1,row2,col1,col2,game);
@@ -349,12 +348,6 @@ void play_game(Game *game){
                 }
                 else
                     record_move( &(game->moves[game->number_of_moves]), row1,row2,col1,col2);
-            }
-
-            if(!valid_input){
-                char wrong_input[100000];
-                fgets(wrong_input,100000-1,stdin);
-                printf("Enter Valid numbers\n");
             }
         } while (!valid_input);
 
@@ -424,7 +417,7 @@ void play_main_menu(Game *game){
         play_game(game);
         break;
     case '2':
-        load_game(1);
+        load_game();
         break;
     case '3':
 
@@ -457,7 +450,6 @@ int main()
         printf("%3d  %s\n", k, "I want to be nice today!");
     }*/
     Game game;
-
     //print_grid(&game);
     play_main_menu(&game);
 

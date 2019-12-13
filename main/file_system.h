@@ -1,8 +1,13 @@
-Game load_game (int file_num){
+#include <string.h>
+Game load_game (){
     FILE *save_file;
     char file_name[] = "save_X.dat";
-    printf("Enter save file number: \n");
-    scanf("%d",&file_num);
+    int file_num;
+    do{
+        printf("Enter file number:\n");
+        file_num = input_file_number();
+    }while (file_num == -1);
+
     file_name[5] = file_num + 48;
     printf("file name = %s\n",file_name);
     save_file = fopen(file_name,"rb");
@@ -11,30 +16,24 @@ Game load_game (int file_num){
     fread(&game,sizeof(Game),1,save_file);
     fclose(save_file);
 
-    print_game_struct_values(&game);
-    print_grid(&game);
+    play_game(&game);
 }
 
-bool is_save(char input_str[1000]){
-
-    char save[] = {'s','a','v','e','\0'};
-    //checking if input_str = "save". I love C
-    for (int i = 0;input_str[i] != '\n';i++){
-        if (input_str[i] != save[i]  || i > 4){
-            return false;
-        }
-    }
-    return true;
+bool compare_str(char input_str[], char option_str[]){
+    // adds an enter character to match the input_str
+    if (strcmp(option_str, input_str) == 0)
+        return true;
+    return false;
 }
 
-void save_menu(Game *game){
+void save_game(Game *game){
     FILE *save_file;
     char file_name[] = "save_X.dat";
     printf("Enter save file number: \n");
-
-    //Remains to be validated TODO
     int file_num;
-    scanf("%d",&file_num);
+    do{
+        file_num = input_file_number();
+    }while(file_num == -1);
     file_name[5] = file_num + 48;
     printf("file name = %s\n",file_name);
     save_file = fopen(file_name,"wb");
@@ -46,3 +45,15 @@ void save_menu(Game *game){
     fclose(save_file);
 }
 
+int input_file_number(){
+    char input_str[1000] = "";
+    fgets(input_str, 1000, stdin);
+    if (input_str[0] == '\0' || input_str[1] != 10)
+        return -1;
+
+    if (input_str[0] >= 49 && input_str[0] <= 51){
+        int x = input_str[0] - 48;
+        return x;
+    }
+    return -1;
+}
