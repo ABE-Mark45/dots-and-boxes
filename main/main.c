@@ -4,6 +4,7 @@
 #include <windows.h>
 #include "structs.h"
 #include "file_system.h"
+#include <time.h>
 #define blue 9
 #define green 10
 #define white 15
@@ -33,6 +34,8 @@ Beginner Game:
 
 */
 
+int stack_index = 0;
+
 void print_all_played_moves(Game *game){
     int num_of_moves = game->number_of_moves;
     for(int i=0; i<num_of_moves; i++){
@@ -48,6 +51,7 @@ void record_move(Move *move, int row1, int row2, int col1,int col2){
     move->row2 = row2;
     move->col1 = col1;
     move->col2 = col2;
+    stack_index++;
 }
 
 bool is_move_previously_played(Game *game,int row1, int row2, int col1, int col2){
@@ -158,7 +162,7 @@ void print_grid(Game *game){
 
     fill_string(full_side,'-',scale);
     fill_string(empty_side,' ',scale);
-    fill_string(full_box,'#',scale);
+    fill_string(full_box,219,scale);
     /*
         IF the Square of size (3) (scale=3):
 
@@ -308,13 +312,17 @@ void color_square(Square *square, int player_turn){
 
 void play_game(Game *game){
     int row1,row2,col1,col2;
+    float seconds = 0.0;
     while(game->number_of_moves < (game->grid_length*(game->grid_length+1))*2 ){
         // print game after each play
+
+        clock_t start = clock();
+
         print_grid(game);
         printf("\n");
         printf("player1 Points: %d - player2 points: %d\n", game->player1_points,
            game->player2_points);
-        printf("Enter \"save\" to save\n");
+        printf("Enter \"save\" to save\nEnter \"u\" to undo\nEnter \"r\" to redo\nEnter \"exit\" to exit\t\tseconds%.2f\n",seconds);
         bool valid_input;
         do{
 
@@ -322,7 +330,6 @@ void play_game(Game *game){
             fgets(input_str,1000,stdin);
 
             if (compare_str(input_str, "save\n")){
-                printf("detected save \n");
                 save_game(game);
                 continue;
             }
@@ -332,9 +339,9 @@ void play_game(Game *game){
                 return;
             }
 
+
             int num_of_inputs;
             num_of_inputs = sscanf(input_str,"%d %d %d %d",&row1,&row2,&col1,&col2);
-
             printf("\n-----------------------------------------\n");
             printf("%s",input_str);
             printf("num = %d\n",num_of_inputs);
@@ -389,6 +396,10 @@ void play_game(Game *game){
 
         game->player_turn = (3 - game->player_turn); // change player
         game->number_of_moves++;
+
+        clock_t end = clock();
+        seconds = (float)(end - start) / CLOCKS_PER_SEC;
+
 
 
     }
@@ -452,7 +463,11 @@ int main()
     }*/
     Game game;
     //print_grid(&game);
-    play_main_menu(&game);
+    //play_main_menu(&game);
+    LASTINPUTINFO li;
+    li.cbSize = sizeof(LASTINPUTINFO);
+    while (1)
+        printf("%f",GetLastInputInfo(&li));
 
     return 0;
 }
