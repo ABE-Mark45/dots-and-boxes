@@ -182,10 +182,8 @@ bool validate_points(int row1, int row2, int col1, int col2, Game *game){
 
     bool adjacent = (row1 == row2 || col1 == col2)
     && (abs(row1 - row2) == 1 || abs(col1 - col2) == 1) ;
-    if(! adjacent)
-        return false;
 
-    return 1;
+    return adjacent;
 
 }
 
@@ -489,7 +487,7 @@ void display_game(Game *game){
     printf("player1 Points: %d - player2 points: %d\n\n", game->player1_points,
        game->player2_points);
 
-
+    printf("Player %d turn/n/n", game->player_turn);
     printf("Type \'undo\' to undo a move\n");
     printf("Type \'redo\' to save a move\n");
 
@@ -564,6 +562,10 @@ void computer_to_play(Game *game, int *row1, int *row2, int *col1, int *col2){
     }
 }
 
+bool validateNum(Game *game, char a)
+{
+    return a >= '0' && a < ('0' + game->grid_length);
+}
 
 
 void take_coordinates_input(Game *game, int *row1, int *row2, int *col1, int *col2){
@@ -603,12 +605,28 @@ void take_coordinates_input(Game *game, int *row1, int *row2, int *col1, int *co
         }
 
 
-        int num_of_inputs;
 
-        num_of_inputs = sscanf(input_str,"%d %d %d %d",row1,row2,col1,col2);
+        if(strlen(input_str) == 4 && validateNum(game, input_str[1]) && validateNum(game, input_str[2]))
+        {
+            printf("HERE\n");
+            *row1 = (int)(input_str[1] - '0');
+            *col1 = (int)(input_str[2] - '0');
+            if(input_str[0] == 'r')
+            {
+                *row2 = *row1;
+                *col2 = *col1+1;
+            }else if(input_str[0] == 'c')
+            {
+                *row2 = *row1+1;
+                *col2 = *col1;
+            }else
+            continue;
 
+        }
+
+        //num_of_inputs = sscanf(input_str,"%d %d %d %d",row1,row2,col1,col2);
         test3;
-        delay(2);
+        delay(1);
         /*printf("\n-----------------------------------------\n");
         printf("%s",input_str);
         printf("num = %d\n",num_of_inputs);
@@ -616,7 +634,7 @@ void take_coordinates_input(Game *game, int *row1, int *row2, int *col1, int *co
         printf("-----------------------------------------\n\n");
 */
 
-        valid_input = num_of_inputs == 4 && validate_points(*row1,*row2,*col1,*col2,game);
+        valid_input = validate_points(*row1,*row2,*col1,*col2,game);
 
         if(valid_input){
             if(is_move_previously_played(game, *row1,*row2,*col1,*col2) == true){
@@ -708,6 +726,13 @@ void play_game(Game *game){
 void play_main_menu(Game *game){
 
     system("@cls||clear");
+    printf("\t\t\t\t\t\t\t _________________\n");
+    printf("\t\t   ****\t\t\t\t\t|     |     |     |\n");
+    printf("\t	 ********\t\t\t\t|_____|_____|_____|\n");
+    printf("\t	**********\t\t\t\t|     |     |     |\n");
+    printf("\t	 ********\t\t\t\t|_____|_____|_____|\n");
+    printf("\t	   ****	\t\t\t\t|     |     |     |\n");
+    printf("\t\t\t\t\t\t\t|_____|_____|_____|\n");
     printf("1.Start a New Game\n"
             "2.Load a Game\n"
             "3.Top 10 Players\n"
