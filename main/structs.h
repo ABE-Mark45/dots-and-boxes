@@ -8,6 +8,17 @@ typedef struct{
     int covered_by_player;
 } Square;
 
+typedef struct{
+    char name[1000];
+    int best_score;
+    int id;
+} Player;
+
+typedef struct{
+    Player players[1000];
+    int num_of_players;
+} Players_File;
+
 typedef struct {
     bool expert;
     bool PVP;
@@ -16,8 +27,11 @@ typedef struct {
     int player2_points;
     int number_of_moves;
     int player_turn;
-    Move moves[100];
+    bool can_redo;
+    int max_redo;
+    Move moves[1000];
     Square grid[20][20];
+    char winner_name[1000];
 
 } Game;
 
